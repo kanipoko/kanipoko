@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>簿記パズル - Balance Sheet Battle</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>⚖️ Balance Sheet Battle</h1>
+            <div class="game-status">
+                <div class="status-item">
+                    <span class="label">現金:</span>
+                    <span id="cash" class="value">¥1,000,000</span>
+                </div>
+                <div class="status-item">
+                    <span class="label">総資産:</span>
+                    <span id="total-assets" class="value">¥1,000,000</span>
+                </div>
+                <div class="status-item">
+                    <span class="label">自己資本比率:</span>
+                    <span id="equity-ratio" class="value">100%</span>
+                </div>
+                <div class="status-item">
+                    <span class="label">スコア:</span>
+                    <span id="score" class="value">0</span>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="game-area">
+                <div class="transaction-display">
+                    <h2>取引</h2>
+                    <div id="current-transaction" class="transaction-card">
+                        <p class="transaction-text">ゲームを開始してください</p>
+                    </div>
+                </div>
+
+                <div class="entry-options">
+                    <h3>仕訳を選択:</h3>
+                    <div id="entry-choices" class="choices-grid">
+                        <!-- ゲーム開始後に動的に生成 -->
+                    </div>
+                </div>
+
+                <div class="balance-sheet">
+                    <h3>バランスシート</h3>
+                    <div class="bs-container">
+                        <div class="bs-side">
+                            <h4>資産</h4>
+                            <div id="assets-list" class="account-list">
+                                <div class="account-item">
+                                    <span>現金</span>
+                                    <span>¥1,000,000</span>
+                                </div>
+                            </div>
+                            <div class="account-total">
+                                <strong>総資産</strong>
+                                <strong id="bs-total-assets">¥1,000,000</strong>
+                            </div>
+                        </div>
+                        <div class="bs-side">
+                            <h4>負債</h4>
+                            <div id="liabilities-list" class="account-list">
+                                <div class="account-item empty">
+                                    <span>-</span>
+                                    <span>¥0</span>
+                                </div>
+                            </div>
+                            <h4>純資産</h4>
+                            <div id="equity-list" class="account-list">
+                                <div class="account-item">
+                                    <span>資本金</span>
+                                    <span>¥1,000,000</span>
+                                </div>
+                            </div>
+                            <div class="account-total">
+                                <strong>総負債・純資産</strong>
+                                <strong id="bs-total-liabilities-equity">¥1,000,000</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="controls">
+            <button id="start-button" class="btn btn-primary">ゲーム開始</button>
+            <button id="pause-button" class="btn btn-secondary" disabled>一時停止</button>
+        </div>
+
+        <div id="game-over-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>ゲームオーバー</h2>
+                <p id="game-over-reason"></p>
+                <p>最終スコア: <span id="final-score"></span></p>
+                <button id="restart-button" class="btn btn-primary">もう一度プレイ</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="bookkeeping.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
