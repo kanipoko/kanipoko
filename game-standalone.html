@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>簿記パズル - Balance Sheet Battle</title>
+    <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.game-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 2rem;
+}
+
+.game-status {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    min-width: 120px;
+}
+
+.status-item .label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.status-item .value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+}
+
+main {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.game-area {
+    display: grid;
+    gap: 20px;
+}
+
+.transaction-display {
+    text-align: center;
+}
+
+.transaction-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.transaction-text {
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.entry-options {
+    margin-top: 20px;
+}
+
+.entry-options h3 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.choices-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.choice-card {
+    background: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.choice-card:hover {
+    background: #e9ecef;
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.choice-card.correct {
+    background: #d4edda;
+    border-color: #28a745;
+}
+
+.choice-card.incorrect {
+    background: #f8d7da;
+    border-color: #dc3545;
+}
+
+.entry-side {
+    margin-bottom: 10px;
+}
+
+.entry-side h4 {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.entry-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 0.95rem;
+}
+
+.balance-sheet {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 2px solid #dee2e6;
+}
+
+.balance-sheet h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.bs-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.bs-side {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.bs-side h4 {
+    color: #667eea;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #667eea;
+}
+
+.account-list {
+    margin-bottom: 15px;
+}
+
+.account-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.account-item.empty {
+    color: #999;
+    font-style: italic;
+}
+
+.account-total {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-top: 3px double #333;
+    margin-top: 10px;
+    font-size: 1.1rem;
+}
+
+.controls {
+    text-align: center;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.btn {
+    padding: 12px 30px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #5a6268;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h2 {
+    color: #dc3545;
+    margin-bottom: 20px;
+}
+
+.modal-content p {
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+    .bs-container {
+        grid-template-columns: 1fr;
+    }
+
+    .game-status {
+        justify-content: center;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>⚖️ Balance Sheet Battle</h1>
+            <div class="game-status">
+                <div class="status-item">
+                    <span class="label">現金:</span>
+                    <span id="cash" class="value">¥1,000,000</span>
+                </div>
+                <div class="status-item">
+                    <span class="label">総資産:</span>
+                    <span id="total-assets" class="value">¥1,000,000</span>
+                </div>
+                <div class="status-item">
+                    <span class="label">自己資本比率:</span>
+                    <span id="equity-ratio" class="value">100%</span>
+                </div>
+                <div class="status-item">
+                    <span class="label">スコア:</span>
+                    <span id="score" class="value">0</span>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="game-area">
+                <div class="transaction-display">
+                    <h2>取引</h2>
+                    <div id="current-transaction" class="transaction-card">
+                        <p class="transaction-text">ゲームを開始してください</p>
+                    </div>
+                </div>
+
+                <div class="entry-options">
+                    <h3>仕訳を選択:</h3>
+                    <div id="entry-choices" class="choices-grid">
+                        <!-- ゲーム開始後に動的に生成 -->
+                    </div>
+                </div>
+
+                <div class="balance-sheet">
+                    <h3>バランスシート</h3>
+                    <div class="bs-container">
+                        <div class="bs-side">
+                            <h4>資産</h4>
+                            <div id="assets-list" class="account-list">
+                                <div class="account-item">
+                                    <span>現金</span>
+                                    <span>¥1,000,000</span>
+                                </div>
+                            </div>
+                            <div class="account-total">
+                                <strong>総資産</strong>
+                                <strong id="bs-total-assets">¥1,000,000</strong>
+                            </div>
+                        </div>
+                        <div class="bs-side">
+                            <h4>負債</h4>
+                            <div id="liabilities-list" class="account-list">
+                                <div class="account-item empty">
+                                    <span>-</span>
+                                    <span>¥0</span>
+                                </div>
+                            </div>
+                            <h4>純資産</h4>
+                            <div id="equity-list" class="account-list">
+                                <div class="account-item">
+                                    <span>資本金</span>
+                                    <span>¥1,000,000</span>
+                                </div>
+                            </div>
+                            <div class="account-total">
+                                <strong>総負債・純資産</strong>
+                                <strong id="bs-total-liabilities-equity">¥1,000,000</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="controls">
+            <button id="start-button" class="btn btn-primary">ゲーム開始</button>
+            <button id="pause-button" class="btn btn-secondary" disabled>一時停止</button>
+        </div>
+
+        <div id="game-over-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>ゲームオーバー</h2>
+                <p id="game-over-reason"></p>
+                <p>最終スコア: <span id="final-score"></span></p>
+                <button id="restart-button" class="btn btn-primary">もう一度プレイ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+// 簿記エンジン
+class BookkeepingEngine {
+    constructor() {
+        // 勘定科目の種類
+        this.accountTypes = {
+            ASSET: 'asset',
+            LIABILITY: 'liability',
+            EQUITY: 'equity',
+            REVENUE: 'revenue',
+            EXPENSE: 'expense'
+        };
+
+        // 勘定科目マスター
+        this.accounts = {
+            // 資産
+            '現金': { type: this.accountTypes.ASSET, balance: 1000000 },
+            '売掛金': { type: this.accountTypes.ASSET, balance: 0 },
+            '商品': { type: this.accountTypes.ASSET, balance: 0 },
+            '建物': { type: this.accountTypes.ASSET, balance: 0 },
+            '機械装置': { type: this.accountTypes.ASSET, balance: 0 },
+
+            // 負債
+            '買掛金': { type: this.accountTypes.LIABILITY, balance: 0 },
+            '借入金': { type: this.accountTypes.LIABILITY, balance: 0 },
+            '未払金': { type: this.accountTypes.LIABILITY, balance: 0 },
+
+            // 純資産
+            '資本金': { type: this.accountTypes.EQUITY, balance: 1000000 },
+            '繰越利益剰余金': { type: this.accountTypes.EQUITY, balance: 0 },
+
+            // 収益
+            '売上': { type: this.accountTypes.REVENUE, balance: 0 },
+            '受取利息': { type: this.accountTypes.REVENUE, balance: 0 },
+
+            // 費用
+            '仕入': { type: this.accountTypes.EXPENSE, balance: 0 },
+            '給料': { type: this.accountTypes.EXPENSE, balance: 0 },
+            '地代家賃': { type: this.accountTypes.EXPENSE, balance: 0 },
+            '支払利息': { type: this.accountTypes.EXPENSE, balance: 0 }
+        };
+
+        this.journalEntries = [];
+        this.turnCount = 0;
+    }
+
+    // 仕訳を記帳
+    postEntry(debitAccount, debitAmount, creditAccount, creditAmount) {
+        if (debitAmount !== creditAmount) {
+            throw new Error('借方と貸方の金額が一致しません');
+        }
+
+        // 借方の処理
+        this.updateAccount(debitAccount, debitAmount, 'debit');
+
+        // 貸方の処理
+        this.updateAccount(creditAccount, creditAmount, 'credit');
+
+        // 仕訳帳に記録
+        this.journalEntries.push({
+            turn: this.turnCount,
+            debit: { account: debitAccount, amount: debitAmount },
+            credit: { account: creditAccount, amount: creditAmount },
+            timestamp: new Date()
+        });
+
+        this.turnCount++;
+    }
+
+    // 勘定科目の残高を更新
+    updateAccount(accountName, amount, side) {
+        const account = this.accounts[accountName];
+        if (!account) {
+            throw new Error(`勘定科目 ${accountName} が見つかりません`);
+        }
+
+        const type = account.type;
+
+        // 資産・費用は借方で増加、貸方で減少
+        if (type === this.accountTypes.ASSET || type === this.accountTypes.EXPENSE) {
+            if (side === 'debit') {
+                account.balance += amount;
+            } else {
+                account.balance -= amount;
+            }
+        }
+        // 負債・資本・収益は貸方で増加、借方で減少
+        else {
+            if (side === 'credit') {
+                account.balance += amount;
+            } else {
+                account.balance -= amount;
+            }
+        }
+    }
+
+    // 総資産を計算
+    getTotalAssets() {
+        return Object.entries(this.accounts)
+            .filter(([_, account]) => account.type === this.accountTypes.ASSET)
+            .reduce((sum, [_, account]) => sum + account.balance, 0);
+    }
+
+    // 総負債を計算
+    getTotalLiabilities() {
+        return Object.entries(this.accounts)
+            .filter(([_, account]) => account.type === this.accountTypes.LIABILITY)
+            .reduce((sum, [_, account]) => sum + account.balance, 0);
+    }
+
+    // 純資産を計算（資本 + 当期純利益）
+    getTotalEquity() {
+        const equity = Object.entries(this.accounts)
+            .filter(([_, account]) => account.type === this.accountTypes.EQUITY)
+            .reduce((sum, [_, account]) => sum + account.balance, 0);
+
+        const netIncome = this.getNetIncome();
+        return equity + netIncome;
+    }
+
+    // 当期純利益を計算（収益 - 費用）
+    getNetIncome() {
+        const revenue = Object.entries(this.accounts)
+            .filter(([_, account]) => account.type === this.accountTypes.REVENUE)
+            .reduce((sum, [_, account]) => sum + account.balance, 0);
+
+        const expenses = Object.entries(this.accounts)
+            .filter(([_, account]) => account.type === this.accountTypes.EXPENSE)
+            .reduce((sum, [_, account]) => sum + account.balance, 0);
+
+        return revenue - expenses;
+    }
+
+    // 自己資本比率を計算
+    getEquityRatio() {
+        const totalAssets = this.getTotalAssets();
+        if (totalAssets === 0) return 0;
+        return (this.getTotalEquity() / totalAssets) * 100;
+    }
+
+    // 現金残高を取得
+    getCashBalance() {
+        return this.accounts['現金'].balance;
+    }
+
+    // バランスシートを取得
+    getBalanceSheet() {
+        const assets = {};
+        const liabilities = {};
+        const equity = {};
+
+        Object.entries(this.accounts).forEach(([name, account]) => {
+            if (account.balance !== 0 || name === '現金' || name === '資本金') {
+                if (account.type === this.accountTypes.ASSET) {
+                    assets[name] = account.balance;
+                } else if (account.type === this.accountTypes.LIABILITY) {
+                    liabilities[name] = account.balance;
+                } else if (account.type === this.accountTypes.EQUITY) {
+                    equity[name] = account.balance;
+                }
+            }
+        });
+
+        // 当期純利益を純資産に追加
+        const netIncome = this.getNetIncome();
+        if (netIncome !== 0) {
+            equity['当期純利益'] = netIncome;
+        }
+
+        return { assets, liabilities, equity };
+    }
+
+    // 債務超過チェック
+    isBankrupt() {
+        return this.getTotalEquity() <= 0;
+    }
+
+    // 資金ショートチェック
+    isCashOut() {
+        return this.getCashBalance() < 0;
+    }
+}
+
+// ゲームメインロジック
+class BookkeepingPuzzleGame {
+    constructor() {
+        this.engine = new BookkeepingEngine();
+        this.score = 0;
+        this.isRunning = false;
+        this.isPaused = false;
+        this.currentTransaction = null;
+        this.difficulty = 1;
+        this.correctAnswers = 0;
+        this.timeLimit = 15000; // 15秒
+        this.timer = null;
+
+        // 取引パターン
+        this.transactionPatterns = [
+            {
+                description: '商品を現金で¥{amount}仕入れた',
+                correctEntry: { debit: '商品', credit: '現金' },
+                difficulty: 1,
+                minAmount: 50000,
+                maxAmount: 200000
+            },
+            {
+                description: '商品を¥{amount}で現金販売した（原価¥{cost}）',
+                correctEntry: { debit: '現金', credit: '売上' },
+                difficulty: 1,
+                minAmount: 100000,
+                maxAmount: 300000,
+                hasCost: true
+            },
+            {
+                description: '商品を掛けで¥{amount}販売した',
+                correctEntry: { debit: '売掛金', credit: '売上' },
+                difficulty: 2,
+                minAmount: 150000,
+                maxAmount: 400000
+            },
+            {
+                description: '売掛金¥{amount}を現金で回収した',
+                correctEntry: { debit: '現金', credit: '売掛金' },
+                difficulty: 2,
+                minAmount: 100000,
+                maxAmount: 300000
+            },
+            {
+                description: '商品を掛けで¥{amount}仕入れた',
+                correctEntry: { debit: '商品', credit: '買掛金' },
+                difficulty: 2,
+                minAmount: 80000,
+                maxAmount: 250000
+            },
+            {
+                description: '買掛金¥{amount}を現金で支払った',
+                correctEntry: { debit: '買掛金', credit: '現金' },
+                difficulty: 2,
+                minAmount: 80000,
+                maxAmount: 250000
+            },
+            {
+                description: '銀行から¥{amount}を借り入れた',
+                correctEntry: { debit: '現金', credit: '借入金' },
+                difficulty: 2,
+                minAmount: 500000,
+                maxAmount: 2000000
+            },
+            {
+                description: '給料¥{amount}を現金で支払った',
+                correctEntry: { debit: '給料', credit: '現金' },
+                difficulty: 1,
+                minAmount: 200000,
+                maxAmount: 500000
+            },
+            {
+                description: '家賃¥{amount}を現金で支払った',
+                correctEntry: { debit: '地代家賃', credit: '現金' },
+                difficulty: 1,
+                minAmount: 100000,
+                maxAmount: 300000
+            },
+            {
+                description: '建物¥{amount}を現金で購入した',
+                correctEntry: { debit: '建物', credit: '現金' },
+                difficulty: 2,
+                minAmount: 3000000,
+                maxAmount: 8000000
+            }
+        ];
+
+        this.initializeUI();
+    }
+
+    initializeUI() {
+        document.getElementById('start-button').addEventListener('click', () => this.start());
+        document.getElementById('pause-button').addEventListener('click', () => this.togglePause());
+        document.getElementById('restart-button').addEventListener('click', () => this.restart());
+
+        this.updateUI();
+    }
+
+    start() {
+        this.isRunning = true;
+        this.isPaused = false;
+        this.score = 0;
+        this.correctAnswers = 0;
+        this.difficulty = 1;
+
+        document.getElementById('start-button').disabled = true;
+        document.getElementById('pause-button').disabled = false;
+
+        this.nextTransaction();
+    }
+
+    togglePause() {
+        this.isPaused = !this.isPaused;
+        document.getElementById('pause-button').textContent = this.isPaused ? '再開' : '一時停止';
+
+        if (!this.isPaused && this.currentTransaction) {
+            this.startTimer();
+        } else if (this.timer) {
+            clearTimeout(this.timer);
+        }
+    }
+
+    nextTransaction() {
+        if (!this.isRunning || this.isPaused) return;
+
+        // 難易度に応じて取引を選択
+        const availablePatterns = this.transactionPatterns.filter(p => p.difficulty <= this.difficulty);
+        const pattern = availablePatterns[Math.floor(Math.random() * availablePatterns.length)];
+
+        // 金額を生成
+        const amount = Math.floor(Math.random() * (pattern.maxAmount - pattern.minAmount + 1)) + pattern.minAmount;
+        const roundedAmount = Math.round(amount / 10000) * 10000; // 1万円単位に丸める
+
+        let cost = 0;
+        if (pattern.hasCost) {
+            cost = Math.floor(roundedAmount * 0.6); // 原価率60%
+        }
+
+        this.currentTransaction = {
+            pattern: pattern,
+            amount: roundedAmount,
+            cost: cost,
+            description: pattern.description.replace('{amount}', roundedAmount.toLocaleString()).replace('{cost}', cost.toLocaleString())
+        };
+
+        this.displayTransaction();
+        this.generateChoices();
+        this.startTimer();
+    }
+
+    displayTransaction() {
+        document.getElementById('current-transaction').innerHTML = `
+            <p class="transaction-text">${this.currentTransaction.description}</p>
+        `;
+    }
+
+    generateChoices() {
+        const correctEntry = this.currentTransaction.pattern.correctEntry;
+        const choices = [correctEntry];
+
+        // 不正解の選択肢を生成
+        const allAccounts = Object.keys(this.engine.accounts);
+        const wrongChoices = new Set();
+
+        while (wrongChoices.size < 3) {
+            const debit = allAccounts[Math.floor(Math.random() * allAccounts.length)];
+            const credit = allAccounts[Math.floor(Math.random() * allAccounts.length)];
+
+            if (debit !== credit) {
+                const choice = { debit, credit };
+                const choiceStr = JSON.stringify(choice);
+                const correctStr = JSON.stringify(correctEntry);
+
+                if (choiceStr !== correctStr) {
+                    wrongChoices.add(choiceStr);
+                }
+            }
+        }
+
+        Array.from(wrongChoices).forEach(str => {
+            choices.push(JSON.parse(str));
+        });
+
+        // シャッフル
+        choices.sort(() => Math.random() - 0.5);
+
+        // 表示
+        const choicesContainer = document.getElementById('entry-choices');
+        choicesContainer.innerHTML = '';
+
+        choices.forEach((choice, index) => {
+            const card = document.createElement('div');
+            card.className = 'choice-card';
+            card.innerHTML = `
+                <div class="entry-side">
+                    <h4>借方</h4>
+                    <div class="entry-item">
+                        <span>${choice.debit}</span>
+                        <span>¥${this.currentTransaction.amount.toLocaleString()}</span>
+                    </div>
+                </div>
+                <div class="entry-side">
+                    <h4>貸方</h4>
+                    <div class="entry-item">
+                        <span>${choice.credit}</span>
+                        <span>¥${this.currentTransaction.amount.toLocaleString()}</span>
+                    </div>
+                </div>
+            `;
+            card.addEventListener('click', () => this.selectChoice(choice, card));
+            choicesContainer.appendChild(card);
+        });
+    }
+
+    selectChoice(choice, cardElement) {
+        if (!this.isRunning || this.isPaused) return;
+
+        clearTimeout(this.timer);
+
+        const correctEntry = this.currentTransaction.pattern.correctEntry;
+        const isCorrect = choice.debit === correctEntry.debit && choice.credit === correctEntry.credit;
+
+        if (isCorrect) {
+            cardElement.classList.add('correct');
+            this.handleCorrectAnswer();
+        } else {
+            cardElement.classList.add('incorrect');
+            this.handleWrongAnswer();
+        }
+
+        // 少し待ってから次の取引へ
+        setTimeout(() => {
+            if (this.isRunning) {
+                this.nextTransaction();
+            }
+        }, 1000);
+    }
+
+    handleCorrectAnswer() {
+        const amount = this.currentTransaction.amount;
+        const pattern = this.currentTransaction.pattern;
+
+        try {
+            // 仕訳を記帳
+            this.engine.postEntry(
+                pattern.correctEntry.debit,
+                amount,
+                pattern.correctEntry.credit,
+                amount
+            );
+
+            // 売上原価の処理
+            if (pattern.hasCost && this.currentTransaction.cost > 0) {
+                this.engine.postEntry('仕入', this.currentTransaction.cost, '商品', this.currentTransaction.cost);
+            }
+
+            this.correctAnswers++;
+            this.score += 100 * this.difficulty;
+
+            // 難易度を上げる
+            if (this.correctAnswers % 5 === 0 && this.difficulty < 3) {
+                this.difficulty++;
+                this.timeLimit = Math.max(10000, this.timeLimit - 1000);
+            }
+
+            this.updateUI();
+            this.checkGameOver();
+        } catch (error) {
+            console.error('仕訳記帳エラー:', error);
+        }
+    }
+
+    handleWrongAnswer() {
+        this.score = Math.max(0, this.score - 50);
+        this.updateUI();
+    }
+
+    startTimer() {
+        if (this.timer) {
+            clearTimeout(this.timer);
+        }
+
+        this.timer = setTimeout(() => {
+            if (this.isRunning && !this.isPaused) {
+                this.handleTimeout();
+            }
+        }, this.timeLimit);
+    }
+
+    handleTimeout() {
+        this.gameOver('時間切れです！');
+    }
+
+    checkGameOver() {
+        if (this.engine.isBankrupt()) {
+            this.gameOver('債務超過になりました！');
+        } else if (this.engine.isCashOut()) {
+            this.gameOver('現金がマイナスになりました！');
+        }
+    }
+
+    gameOver(reason) {
+        this.isRunning = false;
+        clearTimeout(this.timer);
+
+        document.getElementById('game-over-reason').textContent = reason;
+        document.getElementById('final-score').textContent = this.score.toLocaleString();
+        document.getElementById('game-over-modal').classList.remove('hidden');
+
+        document.getElementById('start-button').disabled = false;
+        document.getElementById('pause-button').disabled = true;
+    }
+
+    restart() {
+        document.getElementById('game-over-modal').classList.add('hidden');
+        this.engine = new BookkeepingEngine();
+        this.start();
+    }
+
+    updateUI() {
+        // ステータス更新
+        document.getElementById('cash').textContent = `¥${this.engine.getCashBalance().toLocaleString()}`;
+        document.getElementById('total-assets').textContent = `¥${this.engine.getTotalAssets().toLocaleString()}`;
+        document.getElementById('equity-ratio').textContent = `${this.engine.getEquityRatio().toFixed(1)}%`;
+        document.getElementById('score').textContent = this.score.toLocaleString();
+
+        // バランスシート更新
+        const bs = this.engine.getBalanceSheet();
+
+        // 資産
+        const assetsList = document.getElementById('assets-list');
+        assetsList.innerHTML = '';
+        Object.entries(bs.assets).forEach(([name, balance]) => {
+            const item = document.createElement('div');
+            item.className = 'account-item';
+            item.innerHTML = `<span>${name}</span><span>¥${balance.toLocaleString()}</span>`;
+            assetsList.appendChild(item);
+        });
+        document.getElementById('bs-total-assets').textContent = `¥${this.engine.getTotalAssets().toLocaleString()}`;
+
+        // 負債
+        const liabilitiesList = document.getElementById('liabilities-list');
+        liabilitiesList.innerHTML = '';
+        if (Object.keys(bs.liabilities).length === 0) {
+            liabilitiesList.innerHTML = '<div class="account-item empty"><span>-</span><span>¥0</span></div>';
+        } else {
+            Object.entries(bs.liabilities).forEach(([name, balance]) => {
+                const item = document.createElement('div');
+                item.className = 'account-item';
+                item.innerHTML = `<span>${name}</span><span>¥${balance.toLocaleString()}</span>`;
+                liabilitiesList.appendChild(item);
+            });
+        }
+
+        // 純資産
+        const equityList = document.getElementById('equity-list');
+        equityList.innerHTML = '';
+        Object.entries(bs.equity).forEach(([name, balance]) => {
+            const item = document.createElement('div');
+            item.className = 'account-item';
+            item.innerHTML = `<span>${name}</span><span>¥${balance.toLocaleString()}</span>`;
+            equityList.appendChild(item);
+        });
+
+        const totalLiabilitiesEquity = this.engine.getTotalLiabilities() + this.engine.getTotalEquity();
+        document.getElementById('bs-total-liabilities-equity').textContent = `¥${totalLiabilitiesEquity.toLocaleString()}`;
+    }
+}
+
+// ゲーム初期化
+let game;
+window.addEventListener('DOMContentLoaded', () => {
+    game = new BookkeepingPuzzleGame();
+});
+    </script>
+</body>
+</html>
